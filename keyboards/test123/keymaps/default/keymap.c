@@ -82,25 +82,35 @@ unsigned int ADC0_value = 0;
 unsigned int last_ADC0_value = 0;
 unsigned int current_BRI = 0; 
 
-
+unsigned int ADC1_value = 0;
+unsigned int last_ADC1_value = 0;
+unsigned int current_VOL = 0; 
+char str[10];
 void matrix_init_user(void) 
 {
 	ADC0_value = analogReadPin(F7);
 	current_BRI = (ADC0_value/100)*100;
+	
+	ADC1_value = analogReadPin(F6);
+	current_VOL = (ADC1_value/100)*100;
 }
+unsigned int first_statesss = 1 ;
 
 void matrix_scan_user(void) 
 {
-	char str[5];
+	
 	ADC0_value = analogReadPin(F7);
-
+	ADC1_value = analogReadPin(F6);
+//	if(first_statesss == 1)
+//	{
+//		first_statesss = 0;	
+//		tap_code(KC_BRIU);
+//	}
 	if (ADC0_value >= (current_BRI + 100))
 	{
 		current_BRI = current_BRI+100;
 		tap_code(KC_BRIU);
-		itoa(current_BRI, str, 10);
-		send_string(str);
-		send_string("\n");
+		tap_code(KC_BRMU);
 	}
 	else if (ADC0_value <= (current_BRI - 100))
 	{
@@ -108,9 +118,22 @@ void matrix_scan_user(void)
 			{
 				current_BRI = current_BRI-100;
 				tap_code(KC_BRID);
-				itoa(current_BRI, str, 10);
-				send_string(str);
-				send_string("\n");
+				tap_code(KC_BRMD);
+			}
+	}
+	if (ADC1_value >= (current_VOL + 20))
+	{
+		current_VOL = current_VOL + 20;
+		tap_code(KC_VOLU);
+		tap_code(KC__VOLUP);
+	}
+	else if (ADC1_value <= (current_VOL - 20))
+	{
+			if(current_VOL > 0)
+			{
+				current_VOL = current_VOL - 20;
+				tap_code(KC_VOLD);
+				tap_code(KC__VOLDOWN);
 			}
 	}
 }
